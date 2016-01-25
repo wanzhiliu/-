@@ -1,0 +1,2 @@
+Device mapper是linux2.6中支持逻辑卷管理的通用设备映射机制。
+                Userspace A
