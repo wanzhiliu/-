@@ -1,1 +1,60 @@
+LVM利用linux devicp-mapper实现存储系统虚拟化
+
+LVM 基本组成块
+   物理卷 Physical volume(PV) : 可以在上面建了卷组的媒介，可以是硬盘分区
+   卷组 VG(volume group): 一组物理卷收集为一个管理单元
+   逻辑卷Logical volume(LV)： 虚拟分区，由物理区域组成
+   物理区域 Physical extend(PE):硬盘可供指派给逻辑卷的最小单位
+
+
+相关命令
+  1 lvmdisksacn
+  2 pvcreate /dev/sda2
+  vgcreate
+  lvcreate 等
+  
+  
+  相关功能
+  快照
+  迁移
+  扩容
+  增删改
+  
+
+   
+   两块物理硬盘
+                
+  硬盘1 (/dev/sda):
+     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+    |分区1 50GB (物理卷)           |分区2 80GB (物理卷)            |
+    |/dev/sda1                    |/dev/sda2                     |
+    |_ _ _ _ _ _ _ _ _ _ _ _ _ _ _|_ _ _ _ _ _ _ _ _ _ _ _ _ _ __|
+                                  
+  硬盘2 (/dev/sdb):
+     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    |分区1 120GB (物理卷)                         |
+    |/dev/sdb1                                   |
+    | _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _|
+    
+  LVM方式
+
+  卷组VG1 (/dev/MyStorage/ = /dev/sda1 + /dev/sda2 + /dev/sdb1):
+     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ __ 
+    |逻辑卷1 15GB                  |逻辑卷2 35GB                        |逻辑卷3 200GB                         |
+    |/dev/MyStorage/rootvol        |/dev/MyStorage/homevol             |/dev/MyStorage/mediavol              |
+    |_ _ _ _ _ _ _ _ _ _ _ _ _ _ __|_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ __ |_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _|
+    
+    优点
+      比起正常的硬盘分区管理，LVM更富于弹性：
+      使用卷组(VG)，使众多硬盘空间看起来像一个大硬盘。
+      使用逻辑卷（LV），可以创建跨越众多硬盘空间的分区。
+      可以创建小的逻辑卷（LV），在空间不足时再动态调整它的大小。
+      在调整逻辑卷（LV）大小时可以不用考虑逻辑卷在硬盘上的位置，不用担心没有可用的连续空间。It does not depend on the position of the LV within VG, there is no need to ensure surrounding available space.
+      可以在线（online）对逻辑卷（LV）和卷组（VG）进行创建、删除、调整大小等操作。LVM上的文件系统也需要重新调整大小，某些文件系统也支持这样的在线操作。
+      无需重新启动服务，就可以将服务中用到的逻辑卷（LV）在线（online）/动态（live）迁移至别的硬盘上。
+      允许创建快照，可以保存文件系统的备份，同时使服务的下线时间（downtime）降低到最小。
+      这些优点使得LVM对服务器的管理非常有用，对于桌面系统管理的帮助则没有那么显著，你需要根据实际情况进行取舍。
+
+
+
 
