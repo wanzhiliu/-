@@ -2,4 +2,65 @@
    有时候我们会碰到这样的需求，需要执行对象的某个方法，或是需要对对象的某个字段赋值，而方法名或是字段名在编码代码时并不能确定，
    需要通过参数传递字符串的形式输入。这个机制被称为反射（反过来让对象告诉我们他是什么）
    
-2 
+2  Python 提供了一系列内置函数来在运行时列出、获取对象的类型、方法、属性等。
+   比如 type()、dir()、id()、globals()、locals()、getattr()、hasattr()、setattr()、callable()。使用它们可以很简单地实现反射和自省。
+
+例如，反射可以实现在运行时动态地获取函数名然后进行调用：
+
+# 这里有一个类
+class HelloClass(object):
+ 
+    def __init__(self, method):
+        self.method = method
+        print('You are calling me from ' + self.method)
+ 
+    def say_hello(self):
+        print("Hello -- From: " + self.method)
+        print()
+ 
+    def say_goodbye(self):
+        print(">>> Goodbye -- From: " + self.method)
+        print()
+ 
+# 没有反射的情形
+obj = HelloClass('普通方式')
+obj.say_hello()
+ 
+# 有反射的情形
+class_name = "HelloClass"
+method = "say_hello"
+obj = globals()[class_name]('反射方式')
+getattr(obj, method)()
+ 
+# 使用 eval 函数来实现反射
+eval("HelloClass('Eval 反射方式').say_hello()")
+运行结果是：
+
+You are calling me from 普通方式 Hello -- From: 普通方式
+You are calling me from 反射方式
+Hello -- From: 反射方式
+
+You are calling me from Eval 反射方式
+Hello -- From: Eval 反射方式
+可以看到，三种方法达到了同样的效果：新建一个 HelloClass 类的对象，传入代表调用方式字符串，然后调用这个对象的 say_hello() 函数。
+
+第一种方法是常规方法，将 HelloClass 类和 say_hello() 函数名作为代码的方式直接写出。
+
+第二种方法用到了反射，是通过在 globals() 这个全局定义域内所有对象的词典中，查找名为 "HelloClass" 的类，
+然后给它输入字符串参数进行实例化，并赋值给 obj 变量。之后再通过 getattr 函数取得 obj 变量名为 "say_hello" 的方法，然后再调用。
+
+第三种方法也是反射，用到了 eval 函数，但是需要谨慎使用。eval、exec 这两个函数可以将某个字符串当做表达式、代码执行，非常灵活。
+但是如果要运行的字符串是由用户输入拼接而成的，那么就可能被嵌入恶意代码片段而被运行。eval 可以实现从外部载入一段代码并执行的功能，
+这样可以给程序打『热补丁』。
+
+
+例如，在使用 import sys 载入 sys 模块后，sys.platform、getattr(sys, 'platform')、globals()['sys'].platform、getattr(globals()['sys'], 
+'platform')、eval('sys.platform')、getattr(__import__('sys'), 'platform') 这几个写法在运行效果是完全等价的（最后一个写法还无需提前导入模块），
+而自由度越来越大，因为字符串可以在运行时被修改、替换。
+
+
+反射和自省的区别
+按照 Wikipedia 的观点，反射包括自省，但是又多了可以动态修改代码和程序结构的能力。也就是说，自省只是可以知道某个对象的各种属性信息；而反射不仅可以知道这些信息，还可以动态修改自身结构和行为（运行时自己写自己的一部分代码）。
+可以说支持反射的语言必定支持自省，而支持自省的语言不一定支持反射。
+
+
