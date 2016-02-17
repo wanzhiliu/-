@@ -54,6 +54,11 @@ After the function runs
 装饰器语法 ，这里的@my_shiny_new_decorator是another_stand_alone_function = my_shiny_new_decorator(another_stand_alone_function)的简写。
 
 
+装饰器作用： 1 提高效率。 重复调用导致效率低下，，因此考虑使用缓存机制，空间换时间。这里，就可以使用装饰器做缓存，看下面代码：
+https://gist.github.com/xuelangZF/99f59f1b4cf8fb8c08eb
+
+2 扩展外部接口函数（外部接口函数通常不能修改）
+3 用来调试函数（比如增加一些调试信息）
 
 
 
