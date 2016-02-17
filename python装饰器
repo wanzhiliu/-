@@ -1,0 +1,59 @@
+1 手工实现一个简单的装饰器
+def my_shiny_new_decorator(a_function_to_decorate):
+
+    """
+    在my_shiny_new_decorator中重新定义了一个方法，封装了传入参数a_function_to_decorate，
+    """
+    def the_wrapper_around_the_original_function():
+        print "Before the function runs"
+        
+        #执行传入函数
+        a_function_to_decorate()
+        
+        print "After the function runs"
+
+    """
+     现在仅仅是定义了函数，函数还没有执行，下面的return 是my_shiny_new_decorator把the_wrapper_around_the_original_function
+     当做对象返回给上层调用
+    """
+    return the_wrapper_around_the_original_function
+
+
+# 先创建一个函数，这个函数式当做参数传入到my_shiny_new_decorator中
+def a_stand_alone_function():
+    print "I am a stand alone function, don't you dare modify me"
+
+a_stand_alone_function() //这一次仅仅是执行a_stand_alone_function这个函数，输出为：I am a stand alone function, don't you dare modify me
+# outputs: I am a stand alone function, don't you dare modify me
+
+"""
+现在把a_stand_alone_function当做参数传入my_shiny_new_decorator，然后返回包装后的函数，然后赋值给a_stand_alone_function，然后执行
+"""
+
+a_stand_alone_function_decorated = my_shiny_new_decorator(a_stand_alone_function)
+a_stand_alone_function_decorated()
+//执行结果为 
+"""outputs:
+Before the function runs
+I am a stand alone function, don't you dare modify me
+After the function runs
+"""
+
+下面使用装饰器语法重新写上面流程
+@my_shiny_new_decorator
+def another_stand_alone_function():
+    print "Leave me alone"
+
+another_stand_alone_function()
+"""outputs:
+Before the function runs
+Leave me alone
+After the function runs
+"""
+
+装饰器语法 ，这里的@my_shiny_new_decorator是another_stand_alone_function = my_shiny_new_decorator(another_stand_alone_function)的简写。
+
+
+
+
+
