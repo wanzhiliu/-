@@ -1,0 +1,82 @@
+1 最大连续子序列和
+给定K个整数的序列{ N1, N2, ..., NK }，其任意连续子序列可表示为{ Ni, Ni+1, ..., Nj }，其中 1 <= i <= j <= K。
+最大连续子序列是所有连续子序中元素和最大的一个，
+例如给定序列{ -2, 11, -4, 13, -5, -2 }，其最大连续子序列为{ 11, -4, 13 }，最大和为20。
+
+动态规划解法：
+还有一种更好的解法，只需要O（N）的时间。因为最大 连续子序列和只可能是以位置0～n-1中某个位置结尾。
+当遍历到第i个元素时，判断在它前面的连续子序列和是否大于0，如果大于0，则以位置i结尾的最大连续子序列和为元素i和前门的连续子序列和相加；
+否则，则以位置i结尾的最大连续子序列和为元素i。
+状态转移方程： sum[i]=max(sum[i-1]+a[i],a[i])
+
+int maxsequence3(int a[], int len)  
+{  
+    int maxsum, maxhere;  
+    maxsum = maxhere = a[0];   //初始化最大和为a【0】  
+    for (int i=1; i<len; i++) {  
+        if (maxhere <= 0)  
+            maxhere = a[i];  //如果前面位置最大连续子序列和小于等于0，则以当前位置i结尾的最大连续子序列和为a[i]  
+        else  
+            maxhere += a[i]; //如果前面位置最大连续子序列和大于0，则以当前位置i结尾的最大连续子序列和为它们两者之和  
+        if (maxhere > maxsum) {  
+            maxsum = maxhere;  //更新最大连续子序列和  
+        }  
+    }  
+    return maxsum;  
+} 
+
+2 硬币问题
+现存在一堆面值为 V1、V2、V3 … 个单位的硬币，问最少需要多少个硬币才能找出总值为 T 个单位的零钱？
+解题思路：
+1，找出面值最接近T的硬币V
+2，将f(T)问题的求解转换成f(T-V)+1问题的求解，以此出现递归
+public class CoinChange {  
+    /** 
+     * 获取找零硬币个数 
+     * @param coinValue 硬币的面值   
+     * @param totalValue 需要找零的钱数 
+     * @return 
+     */  
+    public int coinNum(int[] coinValue,int totalValue){  
+        List<Integer> coins=new ArrayList<Integer>();  
+        coins.add(0);  
+        for(int i=1;i<=totalValue;i++){  
+            int coin=nearestCoin(i,coinValue);  
+            int coinNum=coins.get(i-coin)+1;  
+            coins.add(coinNum);  
+        }  
+        return coins.get(totalValue);  
+    }  
+    /** 
+     * 获取最接近找零钱数的硬币面值 
+     */  
+    private int nearestCoin(int value,int[] coinValues){  
+        int res=0;  
+        int nearest=Integer.MAX_VALUE;  
+        for(int coinValue:coinValues){  
+            if(coinValue<=value){  
+                int distance=value-coinValue;  
+                if(distance<nearest){  
+                    nearest=distance;  
+                    res=coinValue;  
+                }  
+            }  
+        }  
+        return res;  
+    }  
+}  
+public class Main {  
+    public static void main(String[] args) {  
+        CoinChange coinChange=new CoinChange();  
+        int res=coinChange.coinNum(new int[]{1,2,3,5,11},81);  
+        System.out.println(res);  
+    }  
+}  
+
+
+
+
+
+
+
+
