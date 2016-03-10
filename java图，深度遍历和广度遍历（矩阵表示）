@@ -1,0 +1,227 @@
+package study.graph;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+/**
+ * 无环有向图，阵列表示
+ * @author l00204971
+ *
+ */
+public class AMWGraph {
+	private ArrayList vertexList;
+	private int[][] edges;
+	private int numofEdges;
+	
+	public AMWGraph(int n){
+		edges = new int[n][n];
+		vertexList = new ArrayList();
+		numofEdges = 0;
+	}
+	
+	//返回节点个数
+	public int getNumOfVertex(){
+		return vertexList.size();
+	}
+	
+	//返回边的格式 
+	public int getNumOfEdges(){
+		return numofEdges;
+	}
+	
+	//返回节点i的数据
+	public Object getValueByIndex(int i){
+		return vertexList.get(i);
+	}
+	//返回边v1和v2的权值
+	public int getWeight(int v1, int v2){
+		return edges[v1][v2];
+	}
+	
+	//插入节点,在链表末尾插入 
+	public void insertVertex(Object object)
+	{
+		vertexList.add(vertexList.size(), object);
+	}
+	
+	//插入节点，边的插入
+	public void insertEdge(int i, int j, int weight){
+		edges[i][j] = weight;
+		numofEdges++;
+	}
+	
+	//删除节点
+	public void deleteEdge(int i, int j){
+		edges[i][j] = 0;
+		numofEdges--;
+	}
+	
+	//得到第一个邻接节点的下标
+	public int getFirstNeighbor(int index){
+		for(int i=0; i<vertexList.size(); i++){
+			if(edges[index][i] >0){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	 //根据前一个邻接结点的下标来取得下一个邻接结点
+	//这是根据v1的的邻接节点，上一个邻接节点为V2
+	public int getNextNeighbor(int v1, int v2){
+		for (int j=v2+1;j<vertexList.size();j++) {
+            if (edges[v1][j]>0) {
+            	System.out.println("in getNextNeighbor: " + j);
+                return j;
+            }
+        }
+        return -1;
+	}
+	
+	private void depthFirstSearch(boolean[] isVisited, int i){
+		System.out.println(getValueByIndex(i) + " ");
+		isVisited[i] = true;
+		int w=getFirstNeighbor(i);
+		while (w!=-1) {
+			System.out.println("in b-----------");
+            if (!isVisited[w]) {
+                depthFirstSearch(isVisited,w);
+            }
+            //当depthFirstSearch执行推出的时候，就会执行上一层的 w=getNextNeighbor(i, w);函数 
+            w=getNextNeighbor(i, w);
+        }
+	}
+	
+	
+	  public void depthFirstSearch() {
+	        boolean[] isVisited=new boolean[getNumOfVertex()];
+	        //记录结点是否已经被访问的数组
+	        for (int i=0;i<getNumOfVertex();i++) {
+	            isVisited[i]=false;//把所有节点设置为未访问
+	        }
+	        for(int i=0;i<getNumOfVertex();i++) {
+	            //因为对于非连通图来说，并不是通过一个结点就一定可以遍历所有结点的。
+	        	System.out.println("in a---------------");
+	            if (!isVisited[i]) {
+	                depthFirstSearch(isVisited,i);
+	            }
+	        }
+	    }
+	  
+	  
+	  //私有函数，广度优先遍历
+	    private void broadFirstSearch(boolean[] isVisited,int i) {
+	        int u,w;
+	        LinkedList queue=new LinkedList();
+
+	        //访问结点i
+	        System.out.print(getValueByIndex(i)+"  ");
+	        isVisited[i]=true;
+	        //结点入队列
+	        queue.addLast(i);
+	        while (!queue.isEmpty()) {
+	            u=((Integer)queue.removeFirst()).intValue();
+	            w=getFirstNeighbor(u);
+	            while(w!=-1) {
+	                if(!isVisited[w]) {
+	                        //访问该结点
+	                        System.out.print(getValueByIndex(w)+"  ");
+	                        //标记已被访问
+	                        isVisited[w]=true;
+	                        //入队列
+	                        queue.addLast(w);
+	                }
+	                //寻找下一个邻接结点
+	                w=getNextNeighbor(u, w);
+	            }
+	        }
+	    }
+
+	    //对外公开函数，广度优先遍历
+	    public void broadFirstSearch() {
+	        boolean[] isVisited=new boolean[getNumOfVertex()];
+	        for (int i=0;i<getNumOfVertex();i++) {
+	            isVisited[i]=false;
+	        }
+	        for(int i=0;i<getNumOfVertex();i++) {
+	            if(!isVisited[i]) {
+	                broadFirstSearch(isVisited, i);
+	            }
+	        }
+	    }
+	  
+	  
+	
+	
+	public void printEdge()
+	{
+		for(int i=0; i< vertexList.size(); i++)
+		{
+			for(int j=0; j<vertexList.size(); j++)
+			{
+				System.out.print(edges[i][j]);
+			}
+			System.out.println();
+		}
+	}
+}
+
+
+
+
+
+package study.graph;
+
+public class TestAMWGraph {
+    public static void main(String args[]) {
+    	/**
+    	 * 第二个图 4个节点 4条边
+    	 */
+    	int n=5, e=4;
+    	String labels[] = {"A","B","C","D","E"};
+    	AMWGraph graph=new AMWGraph(n);
+    	for(String label:labels){
+    		graph.insertVertex(label);//插入结点
+    	}
+    	
+    	graph.insertEdge(0, 1, 1);
+    	graph.insertEdge(1, 3, 2);
+//    	graph.insertEdge(1, 2, 5);
+    	graph.insertEdge(0, 2, 3);
+    	graph.insertEdge(3, 4, 3);
+    	
+//    	int n=8,e=9;//分别代表结点个数和边的数目
+//        String labels[]={"1","2","3","4","5","6","7","8"};//结点的标识
+//        AMWGraph graph=new AMWGraph(n);
+//        for(String label:labels) {
+//            graph.insertVertex(label);//插入结点
+//        }
+//        //插入九条边
+//        graph.insertEdge(0, 1, 1);
+//        graph.insertEdge(0, 2, 1);
+//        graph.insertEdge(1, 3, 1);
+//        graph.insertEdge(1, 4, 1);
+//        graph.insertEdge(3, 7, 1);
+//        graph.insertEdge(4, 7, 1);
+//        graph.insertEdge(2, 5, 1);
+//        graph.insertEdge(2, 6, 1);
+//        graph.insertEdge(5, 6, 1);
+//        graph.insertEdge(1, 0, 1);
+//        graph.insertEdge(2, 0, 1);
+//        graph.insertEdge(3, 1, 1);
+//        graph.insertEdge(4, 1, 1);
+//        graph.insertEdge(7, 3, 1);
+//        graph.insertEdge(7, 4, 1);
+//        graph.insertEdge(4, 2, 1);
+//        graph.insertEdge(5, 2, 1);
+//        graph.insertEdge(6, 5, 1);
+
+        System.out.println("深度优先搜索序列为：");
+        graph.depthFirstSearch();
+        System.out.println();
+        
+        System.out.println("广度优先搜索序列为：");
+        graph.broadFirstSearch();
+        
+    }
+}
