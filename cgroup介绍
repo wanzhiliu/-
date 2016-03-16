@@ -7,3 +7,29 @@ Cgroup功能
   4 进程组隔离，比如：使用ns子系统可以使不同的进程组使用不同的namespace,以达到隔离的目的，不同的进程组有各自的进程、网络、
      文件系统挂载空间
   5 进程组控制： 比如：使用freezer子系统可以将进程组挂起和恢复
+  
+  
+Cgroups子系统介绍
+  blkio -- 这个子系统为块设备设定输入/输出限制，比如物理设备（磁盘，固态硬盘，USB 等等）。
+
+   cpu -- 这个子系统使用调度程序提供对 CPU 的 cgroup 任务访问。
+
+   cpuacct -- 这个子系统自动生成 cgroup 中任务所使用的 CPU 报告。
+
+  cpuset -- 这个子系统为 cgroup 中的任务分配独立 CPU（在多核系统）和内存节点。
+
+  devices -- 这个子系统可允许或者拒绝 cgroup 中的任务访问设备。
+
+  freezer -- 这个子系统挂起或者恢复 cgroup 中的任务。
+
+  memory -- 这个子系统设定 cgroup 中任务使用的内存限制，并自动生成由那些任务使用的内存资源报告。
+
+  net_cls -- 这个子系统使用等级识别符（classid）标记网络数据包，可允许 Linux 流量控制程序（tc）识别从具体 cgroup 中生成的数据包。
+
+  ns -- 名称空间子系统。
+  
+  
+  
+  不错的文章 
+  http://www.infoq.com/cn/articles/docker-kernel-knowledge-cgroups-resource-isolation?cm_mc_uid=79471148807314483342920&cm_mc_sid_50200000=1458093753
+  http://www.ibm.com/developerworks/cn/linux/1506_cgroup/index.html
