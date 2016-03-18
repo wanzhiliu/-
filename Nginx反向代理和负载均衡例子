@@ -26,13 +26,14 @@
 
 
 2 nginx反向代理配置例子
+  在nginx.conf中的locationzen proxy_pass中增加服务端的服务端相关信息
+  指令说明：proxy_pass
+   语法：proxy_pass URL
+默认值：no       
+ 使用字段：location, location中的if字段       
+  这个指令设置被代理服务器的地址和被映射的URI，地址可以使用主机名或IP加端口号的形式，例如：proxy_pass http://localhost:8000/uri/;
 
-   upstream backend {
-        server   186.100.8.118:8001 max_fails=2 fail_timeout=30s weight=5;
-        server   186.100.8.118:8000 max_fails=2 fail_timeout=30s weight=1;
-    }
-
-     server {
+       server {
         listen       7888 default_server;
         listen       [::]:7888 default_server;
         server_name  _;
@@ -54,6 +55,52 @@
             proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
             proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
         }
+修改完配置文件可以使用nginx -t测试配置文件格式是否正确
+
+3 配置负载均衡 
+  使用upstream配置负载均衡
+  配置示例
+  upstream backend { //# 负载均衡站点的名称为backend，可以自己取
+        server   186.100.8.118:8001 max_fails=2 fail_timeout=30s weight=5; // # web服务器的IP地址及最大尝试次数和失败时间，以及权杖
+        server   186.100.8.118:8000 max_fails=2 fail_timeout=30s weight=1;
+    }
+     NGINX负载的几种方式
+nginx 的 upstream目前支持4 种方式的分配
+
+轮询（默认）
+每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器down掉，能自动剔除。
+weight
+指定轮询几率，weight和访问比率成正比，用于后端服务器性能不均的情况。
+ip_hash
+每个请求按访问ip的hash结果分配，这样每个ip固定访问一个后端服务器.
+fair（第三方）
+按后端服务器的响应时间来分配请求，响应时间短的优先分配。
+url_hash（第三方）
+每个请求按访问url的hash结果分配，这样每个url固定指向一个后端服务器.
+
+测试 
+ 现在使用python wsgi在8000 和8001端口上启动两个服务，代码示例如下
+ //在8000端口上启动一个server服务 curl http://186.100.8.118:8000 会返回hello world!8000
+ from wsgiref.simple_server import make_server
+
+class AppClass:
+
+    def __call__(self,environ, start_response):
+        status = '200 OK'
+        response_headers = [('Content-type', 'text/plain')]
+        start_response(status, response_headers)
+        return ["hello world!8000"]
+
+app = AppClass()
+httpd = make_server('', 8000, app)
+print "Serving on port 8000..."
+httpd.serve_forever()
+
+ngnix默认启动在80端口，将配置文件修改完成后，service nginx restart重启nginx服务之后，
+curl http://localhost:80 可以看到ngix将请求发送给8000或者8001端口
+随机输出 hello world!8000
+         hello world!8001
+         
 
 
 
