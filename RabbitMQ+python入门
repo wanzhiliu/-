@@ -1,2 +1,14 @@
 转自http://blog.csdn.net/linvo/article/details/5750987
 文章介绍了ramibitMQ的概念，并且有代码实例讲了RabitMQ和python的结合
+
+
+Rabingmq基本介绍
+ 概念介绍
+  Broker:消息队列服务器实体
+  Exchanger: 消息交换机，指定消息按照什么规则，路由到哪个队列
+  Queue:消息队列载体
+  Binding: 把exchange根据关键字进行消息投递
+  vhost:虚拟主机，一个broker可以开设多个vhost，用作不同用户的权限分离
+  producer
+  consumer
+  channel消息通道，在客户端每个连接里，可以建立多个channel，每个channel代表一个会话任务
